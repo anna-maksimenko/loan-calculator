@@ -2,13 +2,9 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "scripts": {
-    "watch:tailwind": "postcss public/tailwind.css -o public/index.css -w",
-    "build:tailwind": "NODE_ENV=production postcss public/tailwind.css -o public/index.css",
-    "dev": "run-p autobuild watch:tailwind",
-    "build": "npm run build:tailwind && rollup -c",
-    "start": "sirv public --single",
-    "start:dev": "sirv public --single --dev",
-    "autobuild": "rollup -c -w"
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",
@@ -22,10 +18,10 @@
     "rollup-plugin-terser": "^7.0.0",
     "svelte": "^3.0.0",
     "svelte-preprocess-less": "^0.4.0",
-    "tailwindcss": "^1.9.2"
+    "tailwindcss": "^1.9.2",
+    "svelte-preprocess": "^4.5.1"
   },
   "dependencies": {
-    "sirv-cli": "^1.0.0",
-    "svelte-preprocess": "^4.5.1"
+    "sirv-cli": "^1.0.0"
   }
 }
