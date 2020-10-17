@@ -1,7 +1,22 @@
 <script>
-	import Tailwindcss from './Tailwindcss.svelte'
+	import axios from 'axios';
 
-	import Form from './components/Form.svelte'
+	import {loanSettings} from './globals.js';
+	import Tailwindcss from './Tailwindcss.svelte';
+	import Form from './components/Form.svelte';
+
+	let settingsPromise = getSettings();
+	 
+	async function getSettings(){
+		const request = await axios({
+			url: '/api/settings',
+			method: 'get'
+		})
+
+		$loanSettings = await request.data;
+
+		return $loanSettings
+	}
 
 </script>
 
@@ -33,4 +48,8 @@
 	<h1>Hello, I am a loan calculator!</h1>
 </main>
 
-<Form/>
+{#await settingsPromise}
+	<p>Loading</p>
+{:then}
+	<Form/>
+{/await}

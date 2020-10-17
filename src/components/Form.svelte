@@ -1,4 +1,6 @@
 <script>
+    import axios from 'axios';
+
     import {userInput, loanSettings} from '../globals.js'
 
     const loanType = $loanSettings.loanTypes[0];
@@ -6,47 +8,25 @@
     $userInput.loanAmount = loanType.minLoanAmount;
     $userInput.loanTerm = loanType.minTerm;
 
-     
+    let paybackPlanPromise = getPaybackPlan();
 
-    function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
-
-        const periodicIntRate = (loanInterestRate / 12) / 100;
-        const totalPaymentCount =  loanTerm * 12;
-        const poweredInterestRate = Math.pow(periodicIntRate + 1, totalPaymentCount);
-        
-        const monthlyPayment = loanAmount * (( periodicIntRate * poweredInterestRate ) / (poweredInterestRate - 1 ));
-        const roundedmonthlyPayment = Math.ceil(monthlyPayment * 100) / 100;
-
-
-        let remainingLoanAmount = loanAmount;
-        let paybackPlan = [];
-
-        while (remainingLoanAmount > 0) {
-            const interestPayment = remainingLoanAmount * periodicIntRate;
-            const roundedinterestPayment = Math.ceil(interestPayment * 100) / 100;
-            const principlePayment = roundedmonthlyPayment - roundedinterestPayment;
-
-            if (remainingLoanAmount < principlePayment) {
-                remainingLoanAmount -= remainingLoanAmount;
-            } else {
-                remainingLoanAmount -= principlePayment;
+    async function getPaybackPlan() {
+        const request = await axios({
+			url: `/api/calc${$loanSettings.loanSchemas[loanType.schema].endpoint}`,
+            method: 'post',
+            data: {
+                amount: $userInput.loanAmount,
+                term: $userInput.loanTerm,
+                rate: loanType.interestRate
             }
-            
-            paybackPlan = [...paybackPlan, {
-                roundedmonthlyPayment, 
-                roundedinterestPayment, 
-                principlePayment,
-                remainingLoanAmount
-            }];
-        }
+        })
+        const response = await request;
 
-        return paybackPlan;
+        return response.data;
     }
 
-    $: paybackPlanResult = calcPaybackPlan($userInput.loanAmount, $userInput.loanTerm, loanType.interestRate);
-
-    $: {
-        console.log(paybackPlanResult);
+    function calcClickHandler() {
+        paybackPlanPromise = getPaybackPlan();
     }
 
 </script>
@@ -61,6 +41,11 @@
 <input type=range min={loanType.minTerm} max={loanType.maxTerm} step="0.5" bind:value={$userInput.loanTerm}>
 <span>{$userInput.loanTerm}</span>
 
-<span>Monthly payment: {paybackPlanResult[0].roundedmonthlyPayment}</span>
+{#await paybackPlanPromise}
+    <p>Calculating your monthly payment</p>
+{:then paybackPlan}
+    <span>Monthly payment: {paybackPlan[0].roundedMonthlyPayment}</span>
+{/await}
+<button on:click={calcClickHandler}>Calculate</button>
 
 
