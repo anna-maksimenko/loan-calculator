@@ -1,13 +1,9 @@
 <script>
 	import Tailwindcss from './Tailwindcss.svelte'
 
-	export let name;
-</script>
+	import Form from './components/Form.svelte'
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+</script>
 
 <style type="text/less">
 	main {
@@ -20,7 +16,7 @@
 	h1 {
 		@apply uppercase;
 		color: #ff3e00;
-		font-size: 4em;
+		font-size: 2em;
 		font-weight: 100;
 	}
 
@@ -32,3 +28,9 @@
 </style>
 
 <Tailwindcss/>
+
+<main>
+	<h1>Hello, I am a loan calculator!</h1>
+</main>
+
+<Form/>
