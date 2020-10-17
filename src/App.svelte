@@ -13,9 +13,15 @@
 			method: 'get'
 		})
 
-		$loanSettings = await request.data;
+		const response = await request;
 
-		return $loanSettings
+		$loanSettings = response.data;
+
+ 		if (response.status === 200 && response.hasOwnProperty('data') && !response.data.hasOwnProperty('error')) {
+			return $loanSettings
+		} else {
+			throw new Error((response.hasOwnProperty('data') && response.data.hasOwnProperty('error')) ? response.data.error : 'Request error');
+		} 
 	}
 
 </script>

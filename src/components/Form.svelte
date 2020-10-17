@@ -22,7 +22,11 @@
         })
         const response = await request;
 
-        return response.data;
+ 		if (response.status === 200 && response.hasOwnProperty('data') && !response.data.hasOwnProperty('error')) {
+			return response.data;
+		} else {
+			throw new Error((response.hasOwnProperty('data') && response.data.hasOwnProperty('error')) ? response.data.error : 'Request error');
+		} 
     }
 
     function calcClickHandler() {

@@ -34,11 +34,22 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
 
 }
 
+function isPositiveNumber(value) {
+    return typeof value === 'number' && !isNaN(value) && value > 0;
+}
+
 module.exports = async (req, res) => {
     const payLoad = req.body;
-    if (payLoad.hasOwnProperty('amount') && payLoad.hasOwnProperty('term') && payLoad.hasOwnProperty('rate')) {
+
+    if (payLoad.hasOwnProperty('amount') && isPositiveNumber(payLoad.amount) && 
+        payLoad.hasOwnProperty('term') && isPositiveNumber(payLoad.term) && payLoad.term >= 0.25 && payLoad.term < 60 &&
+        payLoad.hasOwnProperty('rate') && isPositiveNumber(payLoad.rate) && payLoad.rate < 1000
+        ) {
         const response = await calcPaybackPlan(payLoad.amount, payLoad.term, payLoad.rate);
         res.json(response);
         console.log("Success");
+    } else {
+        console.log('Error: incorrect parameters');
+        res.json({error: 'Incorrect parameters'});
     }
 }
