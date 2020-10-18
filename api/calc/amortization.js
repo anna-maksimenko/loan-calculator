@@ -12,22 +12,33 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
     let paybackPlan = [];
 
     while (remainingLoanAmount > 0) {
+        let paymentObject;
         const interestPayment = remainingLoanAmount * periodicIntRate;
         const roundedinterestPayment = Math.ceil(interestPayment * 100) / 100;
-        const principlePayment = roundedMonthlyPayment - roundedinterestPayment;
-
-        if (remainingLoanAmount < principlePayment) {
-                remainingLoanAmount -= remainingLoanAmount;
+        const lastMonth = (roundedMonthlyPayment - (remainingLoanAmount + roundedinterestPayment - 5)) > 0
+        
+        if (lastMonth) {   
+            paymentObject = {
+                id: paybackPlan.length + 1,
+                roundedMonthlyPayment: remainingLoanAmount + roundedinterestPayment,
+                roundedinterestPayment,
+                principlePayment: remainingLoanAmount,
+                remainingLoanAmount: 0
+            }
+            remainingLoanAmount = 0;
         } else {
-            remainingLoanAmount -= principlePayment;
+            const principlePayment = Math.floor((roundedMonthlyPayment - roundedinterestPayment) * 100) / 100;
+            remainingLoanAmount = parseFloat((remainingLoanAmount - principlePayment).toFixed(2));
+            paymentObject = {
+                id: paybackPlan.length + 1,
+                roundedMonthlyPayment,
+                roundedinterestPayment,
+                principlePayment,
+                remainingLoanAmount
+            }
         }
-
-        paybackPlan = [...paybackPlan, {
-            roundedMonthlyPayment,
-            roundedinterestPayment,
-            principlePayment,
-            remainingLoanAmount
-        }];
+        
+        paybackPlan = [...paybackPlan, paymentObject];
     }
 
     return paybackPlan;
