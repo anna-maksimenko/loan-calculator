@@ -8,23 +8,11 @@
 
 <style type="text/less">
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+		@apply text-center p-4;
 	}
 
 	h1 {
-		@apply uppercase;
-		color: #ff3e00;
-		font-size: 2em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+		@apply uppercase text-purple-500 text-2xl tracking-wide font-thin;
 	}
 </style>
 
@@ -32,10 +20,11 @@
 
 <main>
 	<h1>Hello, I am a loan calculator!</h1>
+	{#await settingsPromise}
+		<p>Loading</p>
+	{:then}
+		<PaybackLayout/>
+	{/await}
 </main>
 
-{#await settingsPromise}
-	<p>Loading</p>
-{:then}
-	<PaybackLayout/>
-{/await}
+

@@ -1,11 +1,12 @@
 <script>
-    import {userInput, loanSettings} from '../globals.js';
+    import {userInput, loanSettings, loanType} from '../globals.js';
     import {getPaybackPlan} from '../helpers/api-service.js';
 
     import SvelteTable from 'svelte-table';
     import Select from 'svelte-select';
+    import Form from './Form.svelte';
 
-    let loanType = $loanSettings.loanTypes[0];
+    $loanType = $loanSettings.loanTypes[0];
 
     const columns = [
         {
@@ -42,46 +43,104 @@
 
     let showTable = false;
 
-    let selectedValue = undefined;
+    $userInput.loanAmount = $loanType.minLoanAmount;
+    $userInput.loanTerm = $loanType.minTerm;
 
-    //let items = [{value: loanType.interestRate, label: `${loanType.typeLabel} (${loanType.interestRate}%)`}]
-
-    $userInput.loanAmount = loanType.minLoanAmount;
-    $userInput.loanTerm = loanType.minTerm;
-
-    let paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
+    let paybackPlanPromise = getPaybackPlan($loanType.schema, $loanType.interestRate);
     console.log(paybackPlanPromise);
 
     function calcClickHandler() {
-        paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
+        paybackPlanPromise = getPaybackPlan($loanType.schema, $loanType.interestRate);
     }
     function showHandler() {
         showTable = !showTable;
     }
 </script>
 
-<style>
-    /* your styles go here */
+<style type="text/less">
+    .calculator{
+        @apply flex flex-col px-2;
+        @media (min-width: 1152px) {
+            @apply flex-row;
+        }
+        @media (min-width: 640px) {
+            @apply p-4;
+        }
+        .calculator-inputs{
+            @apply w-full;
+            flex-basis: 100%;
+            @media (min-width: 1152px) {
+                @apply w-2/5;
+                flex-basis: 40%;
+            }
+        }
+        .calculator-inputs-container, .summary{
+            @apply flex flex-col flex-1 text-gray-700 text-center bg-gray-400 px-4 py-4 m-2 rounded;
+            .submit-btn{
+                @apply py-4;
+                button{
+                    @apply bg-purple-500 text-white py-2 px-4 rounded;
+                    &:focus{
+                        @apply outline-none;
+                    }
+                }
+            }
+            @media (min-width: 640px) {
+                @apply px-2;
+            }
+        }
+        .summary{
+            .summary-loan-info p{
+                @apply font-bold;
+            }
+        } 
+    }
+    :global(th){
+        @apply bg-white border-gray-800;
+    }
+    :global(td, th){
+        @apply text-xs border-white border-solid border;
+        @media (min-width: 475px) {
+            @apply text-base;
+        }
+    }
 </style>
 
-<input type=range min={loanType.minLoanAmount} max={loanType.maxLoanAmount} step="10000" bind:value={$userInput.loanAmount}>
-<span>{$userInput.loanAmount}</span>
+<div class="calculator ">
 
-<input type=range min={loanType.minTerm} max={loanType.maxTerm} step="0.5" bind:value={$userInput.loanTerm}>
-<span>{$userInput.loanTerm}</span>
+    <div class="calculator-inputs">
+        <div class="calculator-inputs-container">
+            <Form/>
+            <div class="submit-btn">
+                <button on:click={calcClickHandler}>Calculate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary">
+        {#await paybackPlanPromise}
+            <p>Calculating your monthly payment...</p>
+        {:then paybackEstimation}
+            <div class="summary-loan-info">
+                <p>Summary:</p>
+                <div class="summary-point">Loan amount: {paybackEstimation.loanAmount}</div>
+                <div class="summary-point">Loan term: {paybackEstimation.loanTerm} years</div>
+                <div class="summary-point">Interest rate: {paybackEstimation.loanInterestRate}%</div>
+                <div class="summary-point">Monthly payment: {paybackEstimation.paybackPlan[0].roundedMonthlyPayment} {$loanType.currency}</div>
+            </div>
+            <div class="submit-btn">
+                <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>
+            </div>
+            {#if showTable}
+                <SvelteTable columns="{columns}" rows="{paybackEstimation.paybackPlan}"></SvelteTable>
+            {/if}
+        {/await}
+    </div>
+</div>
 
 
-<button on:click={calcClickHandler}>Calculate</button>
-{#await paybackPlanPromise}
-    <p>Calculating your monthly payment</p>
-{:then paybackPlan}
-    <Select items={$loanSettings.loanTypes} isClearable={false} bind:selectedValue={loanType}></Select>
-    <span>Monthly payment: {paybackPlan[0].roundedMonthlyPayment}</span>
-    <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>
-    {#if showTable}
-        <SvelteTable columns="{columns}" rows="{paybackPlan}"></SvelteTable>
-    {/if}
-{/await}
+
+
 
 
 

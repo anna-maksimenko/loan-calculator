@@ -20,7 +20,7 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
         if (lastMonth) {   
             paymentObject = {
                 id: paybackPlan.length + 1,
-                roundedMonthlyPayment: remainingLoanAmount + roundedinterestPayment,
+                roundedMonthlyPayment: Math.ceil((remainingLoanAmount + roundedinterestPayment) * 100) / 100,
                 roundedinterestPayment,
                 principlePayment: remainingLoanAmount,
                 remainingLoanAmount: 0
@@ -41,7 +41,12 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
         paybackPlan = [...paybackPlan, paymentObject];
     }
 
-    return paybackPlan;
+    return {
+        paybackPlan,
+        loanAmount,
+        loanTerm,
+        loanInterestRate
+    };
 
 }
 
