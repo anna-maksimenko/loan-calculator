@@ -7,4 +7,6 @@ export const userInput = writable(
     }
 )
 
+export const loanType = writable(undefined);
+
 export const loanSettings = writable(undefined);
