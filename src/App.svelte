@@ -1,29 +1,9 @@
 <script>
-	import axios from 'axios';
-
-	import {loanSettings} from './globals.js';
 	import Tailwindcss from './Tailwindcss.svelte';
 	import Form from './components/Form.svelte';
+	import {getSettings} from './helpers/api-service.js'
 
 	let settingsPromise = getSettings();
-	 
-	async function getSettings(){
-		const request = await axios({
-			url: '/api/settings',
-			method: 'get'
-		})
-
-		const response = await request;
-
-		$loanSettings = response.data;
-
- 		if (response.status === 200 && response.hasOwnProperty('data') && !response.data.hasOwnProperty('error')) {
-			return $loanSettings
-		} else {
-			throw new Error((response.hasOwnProperty('data') && response.data.hasOwnProperty('error')) ? response.data.error : 'Request error');
-		} 
-	}
-
 </script>
 
 <style type="text/less">

@@ -1,5 +1,4 @@
-import { writable, readable } from 'svelte/store';
-
+import { writable } from 'svelte/store';
 
 export const userInput = writable(
     {

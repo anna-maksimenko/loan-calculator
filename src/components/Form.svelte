@@ -1,36 +1,16 @@
 <script>
-    import axios from 'axios';
-
-    import {userInput, loanSettings} from '../globals.js'
+    import {userInput, loanSettings} from '../globals.js';
+    import {getPaybackPlan} from '../helpers/api-service.js';
 
     const loanType = $loanSettings.loanTypes[0];
 
     $userInput.loanAmount = loanType.minLoanAmount;
     $userInput.loanTerm = loanType.minTerm;
 
-    let paybackPlanPromise = getPaybackPlan();
-
-    async function getPaybackPlan() {
-        const request = await axios({
-			url: `/api/calc${$loanSettings.loanSchemas[loanType.schema].endpoint}`,
-            method: 'post',
-            data: {
-                amount: $userInput.loanAmount,
-                term: $userInput.loanTerm,
-                rate: loanType.interestRate
-            }
-        })
-        const response = await request;
-
- 		if (response.status === 200 && response.hasOwnProperty('data') && !response.data.hasOwnProperty('error')) {
-			return response.data;
-		} else {
-			throw new Error((response.hasOwnProperty('data') && response.data.hasOwnProperty('error')) ? response.data.error : 'Request error');
-		} 
-    }
+    let paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
 
     function calcClickHandler() {
-        paybackPlanPromise = getPaybackPlan();
+        paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
     }
 
 </script>
