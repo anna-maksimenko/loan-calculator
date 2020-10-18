@@ -1,35 +1,22 @@
 <script>
-    import {userInput, loanSettings} from '../globals.js';
-    import {getPaybackPlan} from '../helpers/api-service.js';
+    import {userInput, loanSettings, loanType} from '../globals.js';
 
-    const loanType = $loanSettings.loanTypes[0];
-
-    $userInput.loanAmount = loanType.minLoanAmount;
-    $userInput.loanTerm = loanType.minTerm;
-
-    let paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
-
-    function calcClickHandler() {
-        paybackPlanPromise = getPaybackPlan(loanType.schema, loanType.interestRate);
-    }
-
+    import Select from 'svelte-select';
+    import RangeInput from './shared/RangeInput.svelte';
 </script>
 
-<style>
-    /* your styles go here */
+<style type="text/less">
+    .loan-select{
+        @apply py-2;
+    }
 </style>
 
-<input type=range min={loanType.minLoanAmount} max={loanType.maxLoanAmount} step="10000" bind:value={$userInput.loanAmount}>
-<span>{$userInput.loanAmount}</span>
+<form id="loan-settings">
+    <RangeInput name="loan-amount-input" labelText="Loan amount" min={$loanType.minLoanAmount} max={$loanType.maxLoanAmount} step="10000" bind:value={$userInput.loanAmount} outputText={`${$userInput.loanAmount} ${$loanType.currency}`}/>
 
-<input type=range min={loanType.minTerm} max={loanType.maxTerm} step="0.5" bind:value={$userInput.loanTerm}>
-<span>{$userInput.loanTerm}</span>
+    <RangeInput name="loan-term-input" labelText="Loan term" min={$loanType.minTerm} max={$loanType.maxTerm} step="0.5" bind:value={$userInput.loanTerm} outputText={`${$userInput.loanTerm} years`}/>
 
-{#await paybackPlanPromise}
-    <p>Calculating your monthly payment</p>
-{:then paybackPlan}
-    <span>Monthly payment: {paybackPlan[0].roundedMonthlyPayment}</span>
-{/await}
-<button on:click={calcClickHandler}>Calculate</button>
-
-
+    <div class="loan-select">
+        <Select items={$loanSettings.loanTypes} isClearable={false} bind:selectedValue={$loanType}></Select>
+    </div>
+</form>
