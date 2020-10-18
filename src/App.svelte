@@ -1,6 +1,6 @@
 <script>
 	import Tailwindcss from './Tailwindcss.svelte';
-	import Form from './components/Form.svelte';
+	import PaybackLayout from './components/PaybackLayout.svelte';
 	import {getSettings} from './helpers/api-service.js'
 
 	let settingsPromise = getSettings();
@@ -37,5 +37,5 @@
 {#await settingsPromise}
 	<p>Loading</p>
 {:then}
-	<Form/>
+	<PaybackLayout/>
 {/await}
