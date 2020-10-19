@@ -1,12 +1,29 @@
-function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
+/**
+ * Amortization schema calculation logic
+ * This file contains backend logic for amortization schema payback plan calculations based on provided input
+ * This logic has an API interface for processing basic requests and giving appropriate responses
+ * @param {number} amount - number representing total loan amount to calculate. Integer is expected 
+ * @param {number} term - number representing the whole period of loan in years (respects values between 0.25 and 60)
+ * @param {number} rate - number representing annual interest rate in % (respects values less than 1000)
+*/ 
 
+
+/**
+ * calcPaybackPlan 
+ * This function calculates loan payback plan based on amortization schema 
+ * @param {number} loanAmount - number representing total loan amount to calculate. Integer is expected 
+ * @param {number} loanTerm - number representing the whole period of loan in years (respects values between 0.25 and 60)
+ * @param {number} loanInterestRate - number representing annual interest rate in % (respects values less than 1000)
+ * @return {object} { paybackPlan, loanAmount, loanTerm, loanInterestRate } - object containing payback plan array and loan related info
+*/ 
+
+function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
     const periodicIntRate = (loanInterestRate / 12) / 100;
     const totalPaymentCount = loanTerm * 12;
     const poweredInterestRate = Math.pow(periodicIntRate + 1, totalPaymentCount);
 
     const monthlyPayment = loanAmount * ((periodicIntRate * poweredInterestRate) / (poweredInterestRate - 1));
     const roundedMonthlyPayment = Math.ceil(monthlyPayment * 100) / 100;
-
 
     let remainingLoanAmount = loanAmount;
     let paybackPlan = [];
@@ -15,9 +32,10 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
         let paymentObject;
         const interestPayment = remainingLoanAmount * periodicIntRate;
         const roundedinterestPayment = Math.ceil(interestPayment * 100) / 100;
-        const lastMonth = (roundedMonthlyPayment - (remainingLoanAmount + roundedinterestPayment - 5)) > 0
+        const lastMonth = (roundedMonthlyPayment - (remainingLoanAmount + roundedinterestPayment - 5)) > 0 // If last month payment is less than 5 we assume that it will be included in current month as the way to prevent super small payments
         
-        if (lastMonth) {   
+        if (lastMonth) { 
+            // Special case for last month payment to prevent calculation inconsistencies  
             paymentObject = {
                 id: paybackPlan.length + 1,
                 roundedMonthlyPayment: Math.ceil((remainingLoanAmount + roundedinterestPayment) * 100) / 100,
@@ -47,13 +65,13 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
         loanTerm,
         loanInterestRate
     };
-
 }
 
 function isPositiveNumber(value) {
     return typeof value === 'number' && !isNaN(value) && value > 0;
 }
 
+// For discription and expected request data, please, see L.1
 module.exports = async (req, res) => {
     const payLoad = req.body;
 

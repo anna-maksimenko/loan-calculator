@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * This component serves as layout container, requests payback plan calculation from API based on user input and renders the response as summary including payback plan table
+	 */
     import {userInput, loanSettings, loanType} from '../globals.js';
     import {getPaybackPlan} from '../helpers/api-service.js';
 
@@ -47,7 +50,6 @@
     $userInput.loanTerm = $loanType.minTerm;
 
     let paybackPlanPromise = getPaybackPlan($loanType.schema, $loanType.interestRate);
-    console.log(paybackPlanPromise);
 
     function calcClickHandler() {
         paybackPlanPromise = getPaybackPlan($loanType.schema, $loanType.interestRate);
@@ -148,7 +150,6 @@
                 <div class="summary-table">
                     <SvelteTable columns="{columns}" rows="{paybackEstimation.paybackPlan}"></SvelteTable>
                 </div>
-                
             {/if}
         {/await}
     </div>
