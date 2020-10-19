@@ -51,6 +51,7 @@
 
     function calcClickHandler() {
         paybackPlanPromise = getPaybackPlan($loanType.schema, $loanType.interestRate);
+        showTable = false;
     }
     function showHandler() {
         showTable = !showTable;
@@ -90,18 +91,30 @@
             }
         }
         .summary{
+            @apply overflow-hidden;
+            max-height: calc(100vh - 120px);
             .summary-loan-info p{
                 @apply font-bold;
             }
+
         } 
     }
-    :global(th){
-        @apply bg-white border-gray-800;
-    }
-    :global(td, th){
-        @apply text-xs border-white border-solid border;
-        @media (min-width: 475px) {
-            @apply text-base;
+    .summary-table{
+        @apply overflow-y-auto relative;
+        :global(thead){
+            @apply border-none;
+        }
+        :global(th){
+            @apply bg-white border-gray-800 sticky top-0;
+        }
+        :global(tr:nth-child(even)){
+            @apply bg-gray-200;
+        }
+        :global(td, th){
+            @apply text-xs border-none;
+            @media (min-width: 475px) {
+                @apply text-base;
+            }
         }
     }
 </style>
@@ -123,7 +136,7 @@
         {:then paybackEstimation}
             <div class="summary-loan-info">
                 <p>Summary:</p>
-                <div class="summary-point">Loan amount: {paybackEstimation.loanAmount}</div>
+                <div class="summary-point">Loan amount: {paybackEstimation.loanAmount} {$loanType.currency}</div>
                 <div class="summary-point">Loan term: {paybackEstimation.loanTerm} years</div>
                 <div class="summary-point">Interest rate: {paybackEstimation.loanInterestRate}%</div>
                 <div class="summary-point">Monthly payment: {paybackEstimation.paybackPlan[0].roundedMonthlyPayment} {$loanType.currency}</div>
@@ -132,7 +145,10 @@
                 <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>
             </div>
             {#if showTable}
-                <SvelteTable columns="{columns}" rows="{paybackEstimation.paybackPlan}"></SvelteTable>
+                <div class="summary-table">
+                    <SvelteTable columns="{columns}" rows="{paybackEstimation.paybackPlan}"></SvelteTable>
+                </div>
+                
             {/if}
         {/await}
     </div>
