@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * Generic range input component
+	 */
     export let labelText;
     export let name;
     export let min;
@@ -11,9 +14,6 @@
 <style type="text/less">
     .range-input-container{
         @apply flex items-center py-2 ;
-        input[type="range"]{
-            @apply px-2;
-        }
     }
 </style>
 
