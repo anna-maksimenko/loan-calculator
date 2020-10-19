@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * This component includes inputs and select elements/components that allow user to set loan amount, payback time and interest rate
+	 */
     import {userInput, loanSettings, loanType} from '../globals.js';
 
     import Select from 'svelte-select';
