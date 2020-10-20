@@ -161,7 +161,7 @@
                 </div>
             </div>
             <div class="submit-btn">
-                <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>
+                <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback plan{/if}</button>
             </div>
             {#if showTable}
                 <div class="summary-table">
