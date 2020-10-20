@@ -25,9 +25,9 @@
             sortable: false
         },
         {
-            key: 'roundedinterestPayment',
+            key: 'roundedInterestPayment',
             title: 'Interest payment',
-            value: v => v.roundedinterestPayment,
+            value: v => v.roundedInterestPayment,
             sortable: false
         },
         {
@@ -142,6 +142,8 @@
                 <div class="summary-point">Loan term: {paybackEstimation.loanTerm} years</div>
                 <div class="summary-point">Interest rate: {paybackEstimation.loanInterestRate}%</div>
                 <div class="summary-point">Monthly payment: {paybackEstimation.paybackPlan[0].roundedMonthlyPayment} {$loanType.currency}</div>
+                <div class="summary-point">Loan interest cost: {paybackEstimation.roundedInterestPaymentTotal} {$loanType.currency}</div>
+                <div class="summary-point">Total cost: {paybackEstimation.roundedInterestPaymentTotal + paybackEstimation.loanAmount} {$loanType.currency}</div>
             </div>
             <div class="submit-btn">
                 <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>

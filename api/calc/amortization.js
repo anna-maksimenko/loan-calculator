@@ -27,30 +27,32 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
 
     let remainingLoanAmount = loanAmount;
     let paybackPlan = [];
+    let roundedInterestPaymentTotal = 0;
 
     while (remainingLoanAmount > 0) {
         let paymentObject;
         const interestPayment = remainingLoanAmount * periodicIntRate;
-        const roundedinterestPayment = Math.ceil(interestPayment * 100) / 100;
-        const lastMonth = (roundedMonthlyPayment - (remainingLoanAmount + roundedinterestPayment - 5)) > 0 // If last month payment is less than 5 we assume that it will be included in current month as the way to prevent super small payments
+        const roundedInterestPayment = Math.ceil(interestPayment * 100) / 100; 
+        const lastMonth = (roundedMonthlyPayment - (remainingLoanAmount + roundedInterestPayment - 5)) > 0 // If last month payment is less than 5 we assume that it will be included in current month as the way to prevent super small payments
+        roundedInterestPaymentTotal = roundedInterestPaymentTotal + roundedInterestPayment;
         
         if (lastMonth) { 
             // Special case for last month payment to prevent calculation inconsistencies  
             paymentObject = {
                 id: paybackPlan.length + 1,
-                roundedMonthlyPayment: Math.ceil((remainingLoanAmount + roundedinterestPayment) * 100) / 100,
-                roundedinterestPayment,
+                roundedMonthlyPayment: Math.ceil((remainingLoanAmount + roundedInterestPayment) * 100) / 100,
+                roundedInterestPayment,
                 principlePayment: remainingLoanAmount,
                 remainingLoanAmount: 0
             }
             remainingLoanAmount = 0;
         } else {
-            const principlePayment = Math.floor((roundedMonthlyPayment - roundedinterestPayment) * 100) / 100;
+            const principlePayment = Math.floor((roundedMonthlyPayment - roundedInterestPayment) * 100) / 100;
             remainingLoanAmount = parseFloat((remainingLoanAmount - principlePayment).toFixed(2));
             paymentObject = {
                 id: paybackPlan.length + 1,
                 roundedMonthlyPayment,
-                roundedinterestPayment,
+                roundedInterestPayment,
                 principlePayment,
                 remainingLoanAmount
             }
@@ -58,12 +60,14 @@ function calcPaybackPlan(loanAmount, loanTerm, loanInterestRate) {
         
         paybackPlan = [...paybackPlan, paymentObject];
     }
+    roundedInterestPaymentTotal = Math.round(roundedInterestPaymentTotal * 100) / 100;
 
     return {
         paybackPlan,
         loanAmount,
         loanTerm,
-        loanInterestRate
+        loanInterestRate,
+        roundedInterestPaymentTotal
     };
 }
 
