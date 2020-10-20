@@ -4,6 +4,7 @@
 	 */
     import {userInput, loanSettings, loanType} from '../globals.js';
     import {getPaybackPlan} from '../helpers/api-service.js';
+    import {splitByThousands} from '../helpers/math-helpers.js';
 
     import SvelteTable from 'svelte-table';
     import Select from 'svelte-select';
@@ -21,25 +22,25 @@
         {
             key: 'roundedMonthlyPayment',
             title: 'Monthly payment',
-            value: v => v.roundedMonthlyPayment,
+            value: v => splitByThousands(v.roundedMonthlyPayment),
             sortable: false
         },
         {
             key: 'roundedInterestPayment',
             title: 'Interest payment',
-            value: v => v.roundedInterestPayment,
+            value: v => splitByThousands(v.roundedInterestPayment),
             sortable: false
         },
         {
             key: 'principlePayment',
             title: 'Principle payment',
-            value: v => v.principlePayment,
+            value: v => splitByThousands(v.principlePayment),
             sortable: false
         },
         {
             key: 'remainingLoanAmount',
             title: 'Remaining loan amount',
-            value: v => v.remainingLoanAmount,
+            value: v => splitByThousands(v.remainingLoanAmount),
             sortable: false
         }
     ]
@@ -80,7 +81,7 @@
         .calculator-inputs-container, .summary{
             @apply flex flex-col flex-1 text-gray-700 text-center bg-gray-400 px-4 py-4 m-2 rounded;
             .submit-btn{
-                @apply py-4;
+                @apply py-4 mt-auto;
                 button{
                     @apply bg-purple-500 text-white py-2 px-4 rounded;
                     &:focus{
@@ -96,10 +97,18 @@
             @apply overflow-hidden;
             max-height: calc(100vh - 120px);
             .summary-loan-info p{
-                @apply font-bold;
+                //@apply font-bold;
             }
-
-        } 
+            .summary-point-container{
+                @apply flex flex-wrap;
+                .summary-point{
+                    @apply flex-grow-0 flex-shrink-0;
+                    @media (min-width: 475px) {
+                        @apply w-1/2;
+                    }
+                }
+            }
+        }
     }
     .summary-table{
         @apply overflow-y-auto relative;
@@ -114,10 +123,13 @@
         }
         :global(td, th){
             @apply text-xs border-none;
-            @media (min-width: 475px) {
+            @media (min-width: 640px) {
                 @apply text-base;
             }
         }
+    }
+    .caption{
+        @apply font-bold py-4;
     }
 </style>
 
@@ -125,6 +137,7 @@
 
     <div class="calculator-inputs">
         <div class="calculator-inputs-container">
+            <p class="caption">Loan settings:</p>
             <Form/>
             <div class="submit-btn">
                 <button on:click={calcClickHandler}>Calculate</button>
@@ -137,13 +150,15 @@
             <p>Calculating your monthly payment...</p>
         {:then paybackEstimation}
             <div class="summary-loan-info">
-                <p>Summary:</p>
-                <div class="summary-point">Loan amount: {paybackEstimation.loanAmount} {$loanType.currency}</div>
-                <div class="summary-point">Loan term: {paybackEstimation.loanTerm} years</div>
-                <div class="summary-point">Interest rate: {paybackEstimation.loanInterestRate}%</div>
-                <div class="summary-point">Monthly payment: {paybackEstimation.paybackPlan[0].roundedMonthlyPayment} {$loanType.currency}</div>
-                <div class="summary-point">Loan interest cost: {paybackEstimation.roundedInterestPaymentTotal} {$loanType.currency}</div>
-                <div class="summary-point">Total cost: {paybackEstimation.roundedInterestPaymentTotal + paybackEstimation.loanAmount} {$loanType.currency}</div>
+                <p class="caption">Summary:</p>
+                <div class="summary-point-container">
+                    <div class="summary-point">Loan amount: {splitByThousands(paybackEstimation.loanAmount)} {$loanType.currency}</div>
+                    <div class="summary-point">Loan term: {paybackEstimation.loanTerm} years</div>
+                    <div class="summary-point">Interest rate: {paybackEstimation.loanInterestRate}%</div>
+                    <div class="summary-point">Monthly payment: {splitByThousands(paybackEstimation.paybackPlan[0].roundedMonthlyPayment)} {$loanType.currency}</div>
+                    <div class="summary-point">Loan interest cost: {splitByThousands(paybackEstimation.roundedInterestPaymentTotal)} {$loanType.currency}</div>
+                    <div class="summary-point">Total cost: {splitByThousands(paybackEstimation.roundedInterestPaymentTotal + paybackEstimation.loanAmount)} {$loanType.currency}</div>
+                </div>
             </div>
             <div class="submit-btn">
                 <button on:click={showHandler}>{#if !showTable}Show payback plan{:else}Hide payback paln{/if}</button>
