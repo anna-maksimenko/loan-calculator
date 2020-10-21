@@ -12,7 +12,7 @@ User is able to get calculated payback plan based on loan amount, loan term and 
 
 ## Stretch goals
 
-- [ ] Write tests
+- [x] Write tests (basic)
 - [x] Design adjustments (partially complited)
 - [x] CI/CD
 - [x] API integration
@@ -28,6 +28,7 @@ User is able to get calculated payback plan based on loan amount, loan term and 
 - [Svelte table](https://github.com/dasDaniel/svelte-table)
 - [Svelte select](https://github.com/rob-balfre/svelte-select)
 - [Vercel](https://vercel.com/)
+- [Cypress](https://cypress.io/)
 
 - [Draw.io (VS Code integration)](https://draw.io)
 
@@ -73,4 +74,11 @@ To deploy (you need to have vercel account set up):
 
 ```
 vercel
+```
+---
+
+To run tests:
+
+```
+npm run cypress:o
 ```
